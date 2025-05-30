@@ -1,4 +1,4 @@
-# model.py
+import torch
 import torch.nn as nn
 
 class SimpleClassifier(nn.Module):
@@ -7,7 +7,9 @@ class SimpleClassifier(nn.Module):
         self.net = nn.Sequential(
             nn.Linear(input_dim, 128),
             nn.ReLU(),
-            nn.Linear(128, output_dim)
+            nn.Linear(128, 64),
+            nn.ReLU(),
+            nn.Linear(64, output_dim)
         )
 
     def forward(self, x):
