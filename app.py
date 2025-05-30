@@ -6,6 +6,10 @@ import torch
 from collections import Counter
 import csv
 import os
+import pytesseract
+from PIL import Image
+
+pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
 def save_feedback_to_csv(question, topic, is_correct):
     file_exists = os.path.isfile("feedback.csv")
@@ -36,8 +40,17 @@ if "last_topic" not in st.session_state:
 if "awaiting_feedback" not in st.session_state:
     st.session_state.awaiting_feedback = False
 
-# Kullanıcıdan giriş
-user_input = st.text_area("Soru", "")
+uploaded_file = st.file_uploader("📷 Soru fotoğrafı yükle (opsiyonel)", type=["png", "jpg", "jpeg"])
+
+if uploaded_file is not None:
+    image = Image.open(uploaded_file)
+    st.image(image, caption="Yüklenen Görsel", use_column_width=True)
+    ocr_text = pytesseract.image_to_string(image, lang="tur")
+    st.write("📜 Algılanan metin:")
+    st.code(ocr_text.strip())
+    user_input = ocr_text.strip()
+else:
+    user_input = st.text_area("Soru", "")
 
 if st.button("Tahmin Et") and user_input.strip() != "":
     x = dataset.vectorizer.transform([user_input]).toarray()
